@@ -59,27 +59,18 @@ def extract_features_from_data(data_dir: str):
         "compound_id"
     ] = aggregated_experiment_compound_ids.experiment_compound_ids.apply(
         lambda L: Counter(L.split(";")).most_common(1)[0][0]
-    ).astype(
-        int
-    )
+    ).astype(int)
 
-    extracted_features = aggregated_experiment_compound_ids.merge(
-        compounds_df, on="compound_id"
-    )[["user_id", "compound_name"]]
+    extracted_features = aggregated_experiment_compound_ids.merge(compounds_df, on="compound_id")[["user_id", "compound_name"]]
     extracted_features.rename(columns={"compound_name": "most_common_compound_name"})
-    extracted_features = extracted_features.merge(
-        num_experiments_per_user, on="user_id"
-    )
-    extracted_features = extracted_features.merge(
-        average_experiment_runtime, on="user_id"
-    )
+    extracted_features = extracted_features.merge(num_experiments_per_user, on="user_id")
+    extracted_features = extracted_features.merge(average_experiment_runtime, on="user_id")
 
     return extracted_features
 
 
 @contextmanager
 def db_session(engine):
-    # Open a session
     session = sessionmaker(bind=engine)()
 
     try:
